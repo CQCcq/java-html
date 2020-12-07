@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+    <div class="add-user">
+      <el-button type="primary" size="添加" @click="addUser"
+        >添加用户</el-button
+      >
+    </div>
     <el-table
       v-loading="listLoading"
       :data="list"
@@ -56,6 +61,11 @@
           <span>{{ scope.row.display_time }}</span>
         </template>
       </el-table-column>
+      <el-table-column align="center" label="操作" width="200" fixed="right">
+        <template slot-scope="scope">
+          <el-button type="text" @click="editorUser(scope.row)">编辑</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <div style="float:right">
       <el-pagination
@@ -70,13 +80,21 @@
       >
       </el-pagination>
     </div>
+    <add-user
+      :dislogStatus="dialogUser.dislogStatus"
+      @callbackUser="callbackUser"
+    />
   </div>
 </template>
 
 <script>
 import { getList } from "@/api/table";
+import AddUser from "@/components/AddUser/index";
 
 export default {
+  components: {
+    AddUser
+  },
   filters: {
     statusFilter(status) {
       const statusMap = {
@@ -93,6 +111,9 @@ export default {
         pageCurrent: 1,
         pageSize: 10,
         total: 10
+      },
+      dialogUser: {
+        dislogStatus: false
       },
       list: null,
       listLoading: true
@@ -124,7 +145,42 @@ export default {
     handleCurrentChange(val) {
       this.pagination.pageCurrent = val;
       this.fetchData();
+    },
+    addUser() {
+      this.dialogUser.dislogStatus = true;
+    },
+    editorUser(row) {
+      console.log("编辑的用户信息", row);
+    },
+    callbackUser(row) {
+      if (row.status === 0) {
+        this.dialogUser.dislogStatus = false;
+      } else if (row.status === 1) {
+        this.dialogUser.dislogStatus = false;
+      }
     }
   }
 };
 </script>
+
+<style lang="less" scoped>
+.app {
+  &-container {
+    width: 100%;
+    /deep/.el-table {
+      background-color: rgb(177, 24, 207);
+    }
+    .add {
+      &-user {
+        width: 100%;
+        margin-bottom: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+      }
+    }
+  }
+}
+</style>
