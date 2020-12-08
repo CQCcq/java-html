@@ -32,6 +32,19 @@ module.exports = {
   devServer: {
     port: port,
     open: true,
+    proxy: {
+      "/java_web01_war_exploded": {
+        target: "http://localhost:9020/",
+        changeOrigin: true,
+        onProxyReq (proxyReq, req, res) {
+
+        },
+        onProxyRes (proxyRes, req, res) {
+
+        },
+        logLevel: "debug"
+      }
+    },
     overlay: {
       warnings: false,
       errors: true

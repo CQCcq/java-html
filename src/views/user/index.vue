@@ -1,13 +1,20 @@
 <template>
   <div class="app-container">
     <div class="add-user">
-      <el-button type="primary" size="添加" @click="addUser"
-        >添加用户</el-button
-      >
+      <div>
+        <el-button type="primary" size="添加" @click="getUser"
+          >查询用户</el-button
+        >
+      </div>
+      <div>
+        <el-button type="primary" size="添加" @click="addUser"
+          >添加用户</el-button
+        >
+      </div>
     </div>
     <el-table
       v-loading="listLoading"
-      :data="list"
+      :data="userList"
       element-loading-text="Loading"
       border
       fit
@@ -23,19 +30,19 @@
           {{ scope.$index }}
         </template> -->
       </el-table-column>
-      <el-table-column label="Title">
+      <el-table-column label="姓名" width="110">
         <template slot-scope="scope">
-          {{ scope.row.title }}
+          {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
+      <el-table-column label="性别" width="110" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
+          <span>{{ scope.row.gender === 1 ? "男" : "女" }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
+      <el-table-column label="手机号" width="110" align="center">
         <template slot-scope="scope">
-          {{ scope.row.pageviews }}
+          {{ scope.row.mobile }}
         </template>
       </el-table-column>
       <el-table-column
@@ -46,19 +53,35 @@
       >
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusFilter">{{
-            scope.row.status
+            scope.row.status === 1 ? "在职" : "离职"
           }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
         align="center"
         prop="created_at"
-        label="Display_time"
+        label="入职时间"
         width="200"
       >
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
+          <span>{{ scope.row.startTime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="邮箱地址" width="110" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.email }}
+        </template>
+      </el-table-column>
+          <el-table-column label="现居住地址" width="110" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.address }}
+        </template>
+      </el-table-column>
+         </el-table-column>
+          <el-table-column label="个人简介"  align="center">
+        <template slot-scope="scope">
+          {{ scope.row.describe }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="200" fixed="right">
@@ -89,6 +112,7 @@
 
 <script>
 import { getList } from "@/api/table";
+import { getUser } from "@/api/user";
 import AddUser from "@/components/AddUser/index";
 
 export default {
@@ -115,28 +139,43 @@ export default {
       dialogUser: {
         dislogStatus: false
       },
-      list: null,
+      userList: null,
       listLoading: true
     };
   },
   created() {
-    this.fetchData();
+    // this.fetchData();
+    this.getUser();
   },
   methods: {
-    fetchData() {
-      const { pageCurrent, pageSize } = this.pagination;
+    // fetchData() {
+    //   const { pageCurrent, pageSize } = this.pagination;
+    //   this.listLoading = true;
+    //   getList().then(response => {
+    //     console.log("response", response);
+    //     let res = response.data.items.filter(
+    //       (item, index) =>
+    //         (pageCurrent - 1) * pageSize <= index &&
+    //         index < pageCurrent * pageSize
+    //     );
+    //     this.list = res;
+    //     this.listLoading = false;
+    //     this.pagination.total = response.data.total;
+    //   });
+    // },
+    async getUser() {
       this.listLoading = true;
-      getList().then(response => {
-        console.log("response", response);
-        let res = response.data.items.filter(
-          (item, index) =>
-            (pageCurrent - 1) * pageSize <= index &&
-            index < pageCurrent * pageSize
-        );
-        this.list = res;
+      try {
+        let res = await getUser();
+        if (res) {
+          console.log(res);
+          this.listLoading = false;
+          this.userList = res.data;
+        }
+      } catch (error) {
         this.listLoading = false;
-        this.pagination.total = response.data.total;
-      });
+        console.log(error);
+      }
     },
     handleSizeChange(val) {
       this.pagination.pageSize = val;
@@ -167,9 +206,6 @@ export default {
 .app {
   &-container {
     width: 100%;
-    /deep/.el-table {
-      background-color: rgb(177, 24, 207);
-    }
     .add {
       &-user {
         width: 100%;
@@ -177,7 +213,7 @@ export default {
         overflow: hidden;
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
       }
     }

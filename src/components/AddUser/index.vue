@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import { addUser } from "@/api/user";
 export default {
   data() {
     return {
@@ -128,7 +129,14 @@ export default {
     ensureUser(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          this.$emit("callbackUser", { title: "确定", status: 1 });
+          addUser()
+            .then(res => {
+              console.log("成功数据", res);
+              this.$emit("callbackUser", { title: "确定", status: 1 });
+            })
+            .catch(err => {
+              console.log("失败数据");
+            });
         } else {
           console.log("error submit!!");
           return false;
