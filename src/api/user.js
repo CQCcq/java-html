@@ -53,6 +53,17 @@ export function addUser(param) {
 export function getUser() {
   return request({
     url: "/getuser",
-    method: "get"
+    method: "get",
+    headers: {
+      "Content-Type": "application/json;charset=utf-8",
+      charset: "UTF-8",
+      mrToken: "xxxxxxxxxxxxxxx"
+    },
+    params: {
+      pageSize: 10,
+      pageCount:1,
+      userName: "",
+      userMobile: ""
+    }
   });
 }

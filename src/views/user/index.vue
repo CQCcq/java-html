@@ -1,15 +1,25 @@
 <template>
   <div class="app-container">
-    <div class="add-user">
-      <div>
-        <el-button type="primary" size="添加" @click="getUser"
-          >查询用户</el-button
-        >
-      </div>
-      <div>
-        <el-button type="primary" size="添加" @click="addUser"
+   <div class="add_user_button">
+    <el-button type="primary" size="添加" @click="addUser"
           >添加用户</el-button
         >
+   </div>
+    <div class="add-user">
+      <div class="search_form">
+        <el-form :inline="true">
+          <el-form-item label="用户姓名">
+            <el-input v-model="userForm.userName"></el-input>
+          </el-form-item>
+             <el-form-item label="手机号">
+            <el-input v-model="userForm.userMobile"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" size="添加" @click="getUser"
+          >查询用户</el-button
+        >
+          </el-form-item>
+        </el-form>
       </div>
     </div>
     <el-table
@@ -131,6 +141,10 @@ export default {
   },
   data() {
     return {
+      userForm:{
+        userName:"",
+        userMobile:""
+      },
       pagination: {
         pageCurrent: 1,
         pageSize: 10,
@@ -206,15 +220,33 @@ export default {
 .app {
   &-container {
     width: 100%;
+    .add_user_button{
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 20px;
+    }
     .add {
       &-user {
         width: 100%;
-        margin-bottom: 20px;
         overflow: hidden;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        .search{
+          &_form{
+            background-color: #f7f4f4;
+            border: 1px solid #d1d1d1;
+            border-radius: 5px;
+            padding: 22px 10px 0px 10px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+          }
+        }
       }
     }
   }
