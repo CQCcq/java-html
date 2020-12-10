@@ -50,7 +50,7 @@ export function addUser(param) {
   });
 }
 
-export function getUser() {
+export function getUser(param) {
   return request({
     url: "/getuser",
     method: "get",
@@ -60,10 +60,7 @@ export function getUser() {
       mrToken: "xxxxxxxxxxxxxxx"
     },
     params: {
-      pageSize: 10,
-      pageCount:1,
-      userName: "",
-      userMobile: ""
+      ...param
     }
   });
 }

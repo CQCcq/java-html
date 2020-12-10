@@ -105,7 +105,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="pagination.pageCurrent"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="[5, 20, 50, 100]"
         :page-size="pagination.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pagination.total"
@@ -147,8 +147,8 @@ export default {
       },
       pagination: {
         pageCurrent: 1,
-        pageSize: 10,
-        total: 10
+        pageSize: 5,
+        total: 0
       },
       dialogUser: {
         dislogStatus: false
@@ -177,14 +177,21 @@ export default {
     //     this.pagination.total = response.data.total;
     //   });
     // },
-    async getUser() {
+    async getUser(val) {
+      if(val !== 1){
+        this.pagination.pageCurrent = 1;
+        this.pagination.pageSize = 5;
+        this.pagination.total = 0;
+      }
       this.listLoading = true;
+      const {pagination,userForm} = this;
       try {
-        let res = await getUser();
+        let res = await getUser({...userForm,...pagination});
         if (res) {
           console.log(res);
           this.listLoading = false;
           this.userList = res.data;
+          this.pagination.total = res.total;
         }
       } catch (error) {
         this.listLoading = false;
@@ -192,12 +199,13 @@ export default {
       }
     },
     handleSizeChange(val) {
-      this.pagination.pageSize = val;
+      // this.pagination.pageSize = val;
+       this.getUser(1);
       console.log("多少", val);
     },
     handleCurrentChange(val) {
       this.pagination.pageCurrent = val;
-      this.fetchData();
+      this.getUser(1);
     },
     addUser() {
       this.dialogUser.dislogStatus = true;
