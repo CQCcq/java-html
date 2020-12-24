@@ -1,6 +1,7 @@
 import request from "@/utils/request";
 
 export function login(data) {
+  console.log(data);
   return request({
     url: "/vue-admin-template/user/login",
     method: "post",
@@ -34,18 +35,35 @@ export function addUser(param) {
   简短描述
   */
   return request({
-    url: "/MyDatabase",
     method: "post",
-    headers: {
-      "Content-Type": "application/json",
-      charset: "UTF-8",
-      mrToken: "xxxxxxxxxxxxxxx"
-    },
-    params: {
-      name: "wang1",
-      url: "https:www.baidu.com",
-      alexa: 1010,
-      country: "china"
+    url: "/addUser",
+    data: param
+  });
+}
+
+export function editUser(param) {
+  /*
+  姓名
+  性别
+  联系方式
+  邮箱地址
+  现居住地址
+  入职日期
+  简短描述
+  */
+  return request({
+    method: "post",
+    url: "/editUser",
+    data: param
+  });
+}
+
+export function deleteUser(row) {
+  return request({
+    method: "delete",
+    url: "/deleteUser",
+    data: {
+      userId: row.userId
     }
   });
 }

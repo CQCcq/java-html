@@ -13,13 +13,20 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
+    console.log("666666666666666666666",config);
     // do something before request is sent
 
     if (store.getters.token) {
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
+      // "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8;application/json",
+      // charset: "UTF-8",
       config.headers['X-Token'] = getToken()
+    }
+    if((config.method === "post" || config.method === "delete") && config.baseURL === "/java_web01_war_exploded"){
+      config.headers['Content-Type'] = "text/plain;charset=UTF-8;application/json";
+      config.headers['charset'] = "UTF-8"
     }
     return config
   },

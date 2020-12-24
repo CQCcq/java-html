@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog
-      title="添加用户"
+      :title="titleName"
       :visible.sync="centerDialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -22,8 +22,8 @@
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-radio-group v-model="ruleForm.gender">
-            <el-radio label="男"></el-radio>
-            <el-radio label="女"></el-radio>
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="联系方式" prop="mobile">
@@ -40,8 +40,11 @@
             <el-form-item prop="date1">
               <el-date-picker
                 v-model="ruleForm.date1"
-                type="date"
-                placeholder="选择日期"
+                type="datetime"
+                placeholder="选择日期时间"
+                format="yyyy-MM-dd HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                @change="changeTime"
               >
               </el-date-picker>
             </el-form-item>
@@ -62,14 +65,13 @@
 </template>
 
 <script>
-import { addUser } from "@/api/user";
+import { addUser, editUser } from "@/api/user";
 export default {
   data() {
     return {
       ruleForm: {
         name: "",
         date1: "",
-        type: [],
         gender: "",
         mobile: "",
         address: "",
@@ -79,7 +81,7 @@ export default {
       rules: {
         name: [
           { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+          { min: 1, max: 10, message: "长度在 1 到 10 个字符", trigger: "blur" }
         ],
         mobile: [{ required: true, message: "请输入手机号", trigger: "blur" }],
         email: [{ required: true, message: "请输入邮箱账号", trigger: "blur" }],
@@ -88,7 +90,7 @@ export default {
         ],
         date1: [
           {
-            type: "date",
+            type: "string",
             required: true,
             message: "请选择日期",
             trigger: "change"
@@ -105,6 +107,15 @@ export default {
     dislogStatus: {
       type: Boolean,
       default: false
+    },
+    userInfo: {
+      type: Object,
+      default: null
+    }
+  },
+  watch: {
+    userInfo(val) {
+      this.ruleForm = { ...val, date1: val.startTime, desc: val.describe };
     }
   },
   computed: {
@@ -116,6 +127,13 @@ export default {
         return this.$props.dislogStatus;
       }
       //   return this.$props.dislogStatus;
+    },
+    titleName() {
+      if (this.userInfo && this.userInfo.userId) {
+        return "编辑用户";
+      } else {
+        return "新增用户";
+      }
     }
   },
   methods: {
@@ -129,19 +147,31 @@ export default {
     ensureUser(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          addUser()
-            .then(res => {
-              console.log("成功数据", res);
-              this.$emit("callbackUser", { title: "确定", status: 1 });
-            })
-            .catch(err => {
-              console.log("失败数据");
-            });
+          if (this.titleName == "新增用户") {
+            addUser({ ...this.ruleForm })
+              .then(res => {
+                this.$emit("callbackUser", { title: "确定", status: 1 });
+              })
+              .catch(err => {
+                console.log("失败数据");
+              });
+          } else {
+            editUser({ ...this.ruleForm })
+              .then(res => {
+                this.$emit("callbackUser", { title: "确定", status: 1 });
+              })
+              .catch(err => {
+                console.log("失败数据");
+              });
+          }
         } else {
           console.log("error submit!!");
           return false;
         }
       });
+    },
+    changeTime(val) {
+      console.log(val);
     },
     closeDialog(row) {
       console.log("row===================>", row);

@@ -97,6 +97,7 @@
       <el-table-column align="center" label="操作" width="200" fixed="right">
         <template slot-scope="scope">
           <el-button type="text" @click="editorUser(scope.row)">编辑</el-button>
+           <el-button type="text" @click="deleteUser(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -115,6 +116,7 @@
     </div>
     <add-user
       :dislogStatus="dialogUser.dislogStatus"
+      :userInfo="userInfo"
       @callbackUser="callbackUser"
     />
   </div>
@@ -122,7 +124,7 @@
 
 <script>
 import { getList } from "@/api/table";
-import { getUser } from "@/api/user";
+import { getUser,deleteUser } from "@/api/user";
 import AddUser from "@/components/AddUser/index";
 
 export default {
@@ -153,6 +155,7 @@ export default {
       dialogUser: {
         dislogStatus: false
       },
+      userInfo:{},
       userList: null,
       listLoading: true
     };
@@ -162,21 +165,6 @@ export default {
     this.getUser();
   },
   methods: {
-    // fetchData() {
-    //   const { pageCurrent, pageSize } = this.pagination;
-    //   this.listLoading = true;
-    //   getList().then(response => {
-    //     console.log("response", response);
-    //     let res = response.data.items.filter(
-    //       (item, index) =>
-    //         (pageCurrent - 1) * pageSize <= index &&
-    //         index < pageCurrent * pageSize
-    //     );
-    //     this.list = res;
-    //     this.listLoading = false;
-    //     this.pagination.total = response.data.total;
-    //   });
-    // },
     async getUser(val) {
       if(val !== 1){
         this.pagination.pageCurrent = 1;
@@ -211,13 +199,28 @@ export default {
       this.dialogUser.dislogStatus = true;
     },
     editorUser(row) {
+      this.addUser();
+      this.userInfo = row;
       console.log("编辑的用户信息", row);
     },
+   async deleteUser(row){
+    try {
+      const delUser =await  deleteUser(row)
+      const {status} = delUser;
+      if(status) this.getUser();
+    } catch (error) {
+      
+    }
+      console.log("删除用户",row);
+    },
     callbackUser(row) {
+      this.getUser()
       if (row.status === 0) {
         this.dialogUser.dislogStatus = false;
+        this.userInfo = {};
       } else if (row.status === 1) {
         this.dialogUser.dislogStatus = false;
+        this.userInfo = {}
       }
     }
   }
